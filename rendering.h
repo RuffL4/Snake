@@ -1,5 +1,4 @@
-#ifndef RENDERING_H
-#define RENDERING_H
+#pragma once
 #include "logic.h"
 #define TEXTCOLOR RAYWHITE
 #define BUTTON_WIDTH (WIDTH / 3)
@@ -14,7 +13,6 @@
 
 
 
-void drawMainMenu(void); // drawing menu in NEW_GAME State; 
+void drawMainMenu(Texture2D *mainMenuTexture, Button *newGameButton); // drawing menu in NEW_GAME State; 
 	
 
-#endif

@@ -1,5 +1,5 @@
-#ifndef LOGIC_H
-#define LOGIC_H
+#pragma once
+#include "raylib.h"
 #define WIDTH 900
 #define HEIGHT 600
 #define FPS 60
@@ -14,20 +14,30 @@ typedef enum
 	NEW_GAME,
 	PLAYING,
 	GAME_OVER
-} state;
+} State;
 
 typedef enum
 {
 	EMPTY,
 	APPLE,
 	SNAKE,
-} tileTypes;
+} TileTypes;
 
 typedef struct snakeTile
 {
 	int row;
 	int col;
-} snakeTile;
+} SnakeTile;
+
+typedef struct Button
+{
+	Texture2D button;
+	Texture2D button_hovered;
+	Rectangle rect;
+} Button;
+
+Texture2D getMainMenuTexture(void);
+Button initButton(void);
 
 
-#endif
+

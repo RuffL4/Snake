@@ -9,9 +9,12 @@ int main(void)
     InitWindow(WIDTH, HEIGHT, "Snake");
     SetTargetFPS(FPS);
 
-    state gameState = NEW_GAME;
-    tileTypes field[ROWS][COLUMNS];
-    snakeTile *snake = malloc(START_SNAKE_SIZE * sizeof(snakeTile));
+    Texture2D mainMenuTexture = getMainMenuTexture();
+    Button newGameButton = initButton();
+
+    State gameState = NEW_GAME;
+    TileTypes field[ROWS][COLUMNS];
+    SnakeTile *snake = malloc(START_SNAKE_SIZE * sizeof(SnakeTile));
     while (!WindowShouldClose())
     {
 	// For Logic
@@ -34,7 +37,7 @@ int main(void)
 	    switch(gameState)
 	    {
 		    case NEW_GAME:
-			drawMainMenu();
+			drawMainMenu(&mainMenuTexture, &newGameButton);
 			break;
 		    case PLAYING:
 		    	//TODO
@@ -48,6 +51,9 @@ int main(void)
 
     CloseWindow();
     free(snake);
+    UnloadTexture(mainMenuTexture);
+    UnloadTexture(newGameButton.button);
+    UnloadTexture(newGameButton.button_hovered);
 
     return 0;
 }

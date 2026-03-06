@@ -3,8 +3,23 @@
 #include "raylib.h"
 
 
-void drawMainMenu(void)
+void drawMainMenu(Texture2D *mainMenuTexture, Button *newGameButton)
 {
-	DrawRectangle(BUTTON_X, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT, BUTTON_COLOR);
-	DrawText("NEW GAME", TEXT_X, TEXT_Y, FONT_SIZE, TEXT_COLOR);
+	int mouse_x = GetMouseX();
+	int mouse_y = GetMouseY();
+	float button_x = newGameButton->rect.x;
+	float button_y = newGameButton->rect.y;
+	float button_width = newGameButton->rect.width;
+	float button_height = newGameButton->rect.height;
+	
+	
+	DrawTexture(*mainMenuTexture, 0, 0, WHITE);
+	
+	if (mouse_x >= button_x && mouse_x <= button_x + button_width && mouse_y >= button_y && mouse_y <= button_y + button_height)
+	{
+		DrawTexture(newGameButton->button_hovered, button_x, button_y, WHITE);
+	} else
+	{
+		DrawTexture(newGameButton->button, button_x, button_y, WHITE);
+	}	
 }
