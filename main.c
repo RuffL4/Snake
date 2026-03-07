@@ -14,14 +14,16 @@ int main(void)
 
     State gameState = NEW_GAME;
     TileTypes field[ROWS][COLUMNS];
-    SnakeTile *snake = malloc(START_SNAKE_SIZE * sizeof(SnakeTile));
+    Snake *snake = initSnake();
     while (!WindowShouldClose())
     {
+	int mouse_x = GetMouseX();
+	int mouse_y = GetMouseY();
 	// For Logic
 	switch(gameState)
 	{
 		case NEW_GAME:
-			//TODO
+			startNewGame(mouse_x, mouse_y, &newGameButton, &gameState);
 			break;
 		case PLAYING:
 			//TODO
@@ -37,7 +39,7 @@ int main(void)
 	    switch(gameState)
 	    {
 		    case NEW_GAME:
-			drawMainMenu(&mainMenuTexture, &newGameButton);
+			drawMainMenu(mouse_x, mouse_y, &mainMenuTexture, &newGameButton);
 			break;
 		    case PLAYING:
 		    	//TODO
@@ -50,6 +52,7 @@ int main(void)
     }
 
     CloseWindow();
+    free(snake->body);
     free(snake);
     UnloadTexture(mainMenuTexture);
     UnloadTexture(newGameButton.button);

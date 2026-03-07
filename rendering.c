@@ -1,21 +1,18 @@
 #include "rendering.h"
 #include "logic.h"
 #include "raylib.h"
+#include <stdbool.h>
 
 
-void drawMainMenu(Texture2D *mainMenuTexture, Button *newGameButton)
+void drawMainMenu(int mouse_x, int mouse_y, Texture2D *mainMenuTexture, Button *newGameButton)
 {
-	int mouse_x = GetMouseX();
-	int mouse_y = GetMouseY();
 	float button_x = newGameButton->rect.x;
 	float button_y = newGameButton->rect.y;
-	float button_width = newGameButton->rect.width;
-	float button_height = newGameButton->rect.height;
 	
-	
+	bool colision = checkButtonColision(mouse_x, mouse_y, newGameButton);
 	DrawTexture(*mainMenuTexture, 0, 0, WHITE);
 	
-	if (mouse_x >= button_x && mouse_x <= button_x + button_width && mouse_y >= button_y && mouse_y <= button_y + button_height)
+	if (colision)
 	{
 		DrawTexture(newGameButton->button_hovered, button_x, button_y, WHITE);
 	} else
@@ -23,3 +20,4 @@ void drawMainMenu(Texture2D *mainMenuTexture, Button *newGameButton)
 		DrawTexture(newGameButton->button, button_x, button_y, WHITE);
 	}	
 }
+
