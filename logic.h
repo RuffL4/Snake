@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #define WIDTH 900
 #define HEIGHT 600
-#define FPS 60
+#define FPS 10
 #define TILESIZE 30
 #define ROWS (HEIGHT / TILESIZE)
 #define COLUMNS (WIDTH / TILESIZE)
@@ -37,8 +37,8 @@ typedef enum
 
 typedef struct snakeTile
 {
-	int row;
-	int col;
+	int x_pos;
+	int y_pos;
 } SnakeTile;
 
 typedef struct snake
@@ -56,7 +56,9 @@ typedef struct Button
 	Rectangle hitbox;
 } Button;
 
-Snake* initSnake(); 
+Snake* initSnake();
+void moveSnake(Snake *snake); // calculationg where snake body should be 
+void findDirection(Snake *snake); // depend on buttons pressed finding direction
 Texture2D getMainMenuTexture(void); // get Texture for main menu from an Image
 Button initButton(void); // make a new game button from an Image
 bool checkButtonColision(int mouse_x, int mouse_y, Button *newGameButton); // checking if mouse is over the button

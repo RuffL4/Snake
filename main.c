@@ -26,14 +26,14 @@ int main(void)
 			startNewGame(mouse_x, mouse_y, &newGameButton, &gameState);
 			break;
 		case PLAYING:
-			//TODO
+			moveSnake(snake);
 			break;
 		case GAME_OVER:
 			//TODO
 			break;	
 	}
         BeginDrawing();
-            ClearBackground(GREEN);
+            ClearBackground(BLACK);
 	    
 	    // For Rendering 
 	    switch(gameState)
@@ -42,7 +42,7 @@ int main(void)
 			drawMainMenu(mouse_x, mouse_y, &mainMenuTexture, &newGameButton);
 			break;
 		    case PLAYING:
-		    	//TODO
+			drawSnake(snake);
 			break;
 		    case GAME_OVER:
 			//TODO

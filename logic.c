@@ -23,13 +23,57 @@ Snake* initSnake()
 
 	for (int tile = 0; tile < START_SNAKE_SIZE; tile++)
 	{
-		snake->body[tile].row = snake_x;
-	       	snake->body[tile].col = snake_y;
+		snake->body[tile].x_pos = snake_x;
+	       	snake->body[tile].y_pos = snake_y;
 		snake_x += TILESIZE; 	
 	}
 	
 	return snake;
 }
+
+void moveSnake(Snake *snake)
+{
+	findDirection(snake);
+	int length = snake->length - 1;
+	for (int tile = length; tile >= 0; tile--)
+	{
+		if (tile == 0)
+		{
+			switch(snake->direction)
+			{
+				case UP:
+				 	snake->body->y_pos -= TILESIZE;
+					break;
+				case DOWN:
+					snake->body->y_pos += TILESIZE;
+					break;
+				case RIGHT:
+					snake->body->x_pos += TILESIZE;
+					break;
+				case LEFT:
+					snake->body->x_pos -= TILESIZE;
+					break;
+			}
+			break;
+
+		}
+		int next_tile = tile - 1;
+		int next_x_pos = snake->body[next_tile].x_pos;
+		int next_y_pos = snake->body[next_tile].y_pos;
+		snake->body[tile].x_pos = next_x_pos;
+		snake->body[tile].y_pos = next_y_pos;
+	}
+}
+
+void findDirection(Snake *snake)
+{
+	Direction dir = snake->direction;
+	if(IsKeyPressed(KEY_UP) && dir != DOWN) snake->direction = UP;
+	else if(IsKeyPressed(KEY_DOWN) && dir != UP) snake->direction = DOWN;
+	else if(IsKeyPressed(KEY_RIGHT) && dir != LEFT) snake->direction = RIGHT;
+	else if(IsKeyPressed(KEY_LEFT) && dir != RIGHT) snake->direction = LEFT;
+}
+
 
 Texture2D getMainMenuTexture(void)
 {

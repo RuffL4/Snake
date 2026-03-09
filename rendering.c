@@ -21,3 +21,13 @@ void drawMainMenu(int mouse_x, int mouse_y, Texture2D *mainMenuTexture, Button *
 	}	
 }
 
+void drawSnake(Snake *snake)
+{
+	int length = snake->length;
+	for (int tile = 0; tile < length; tile++)
+	{
+		int x_pos = snake->body[tile].x_pos;
+		int y_pos = snake->body[tile].y_pos;
+		DrawRectangle(x_pos, y_pos, TILESIZE, TILESIZE, BLUE);
+	}	
+}
