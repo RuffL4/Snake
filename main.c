@@ -8,13 +8,19 @@ int main(void)
 {
     InitWindow(WIDTH, HEIGHT, "Snake");
     SetTargetFPS(FPS);
+    SetRandomSeed(1);
 
     Texture2D mainMenuTexture = getMainMenuTexture();
     Button newGameButton = initButton();
 
     State gameState = NEW_GAME;
     TileTypes field[ROWS][COLUMNS];
-    Snake *snake = initSnake();
+    initField(field);
+    Snake *snake = initSnake(field);
+    putApple(field);
+    
+    float timeCounter = 0.0f;
+
     while (!WindowShouldClose())
     {
 	int mouse_x = GetMouseX();
@@ -26,7 +32,14 @@ int main(void)
 			startNewGame(mouse_x, mouse_y, &newGameButton, &gameState);
 			break;
 		case PLAYING:
-			moveSnake(snake);
+			timeCounter += GetFrameTime();
+
+			findDirection(snake);
+			if(timeCounter >= MAX_FRAME_TIME)
+			{
+				moveSnake(snake, field, &gameState);
+				timeCounter = 0;
+			}
 			break;
 		case GAME_OVER:
 			//TODO
@@ -42,7 +55,7 @@ int main(void)
 			drawMainMenu(mouse_x, mouse_y, &mainMenuTexture, &newGameButton);
 			break;
 		    case PLAYING:
-			drawSnake(snake);
+			drawField(field);
 			break;
 		    case GAME_OVER:
 			//TODO
@@ -51,12 +64,12 @@ int main(void)
         EndDrawing();
     }
 
-    CloseWindow();
-    free(snake->body);
     free(snake);
     UnloadTexture(mainMenuTexture);
     UnloadTexture(newGameButton.button);
     UnloadTexture(newGameButton.button_hovered);
-
+    CloseWindow();
+    
     return 0;
+
 }

@@ -21,13 +21,25 @@ void drawMainMenu(int mouse_x, int mouse_y, Texture2D *mainMenuTexture, Button *
 	}	
 }
 
-void drawSnake(Snake *snake)
+void drawField(TileTypes field[ROWS][COLUMNS])
 {
-	int length = snake->length;
-	for (int tile = 0; tile < length; tile++)
+	for (int row = 0; row < ROWS; row++)
 	{
-		int x_pos = snake->body[tile].x_pos;
-		int y_pos = snake->body[tile].y_pos;
-		DrawRectangle(x_pos, y_pos, TILESIZE, TILESIZE, BLUE);
-	}	
+		for (int col = 0; col < COLUMNS; col++)
+		{
+			if (field[row][col] == APPLE)
+			{
+				int apple_x = col * TILESIZE;
+				int apple_y = row * TILESIZE;
+				DrawRectangle(apple_x, apple_y, TILESIZE, TILESIZE, APPLE_COLOR);
+
+			} else if (field[row][col] == SNAKE)
+			{
+				int snake_x = col * TILESIZE;
+				int snake_y = row * TILESIZE;
+				DrawRectangle(snake_x, snake_y, TILESIZE, TILESIZE, SNAKE_COLOR);
+			}
+
+		}
+	}
 }

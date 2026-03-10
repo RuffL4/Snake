@@ -1,68 +1,95 @@
 #include "raylib.h"
 #include "logic.h"
 #include <stdlib.h>
+#include <stdbool.h>
 
 
-Snake* initSnake()
+Snake* initSnake(TileTypes field[ROWS][COLUMNS])
 {
 	Snake *snake = malloc(sizeof(Snake));
 	if(snake == NULL) return NULL;
 
-	snake->body = malloc(START_SNAKE_SIZE * sizeof(SnakeTile));
-	if(snake->body == NULL)
-	{
-		free(snake);
-		return NULL;
-	}
-	
 	snake->direction = LEFT;
 	snake->length = START_SNAKE_SIZE;
 	
 	int snake_x = SNAKE_HEAD_START_X;
 	int snake_y = SNAKE_HEAD_START_Y;
 
+	int row = snake_y / TILESIZE;
+	int col;
+
 	for (int tile = 0; tile < START_SNAKE_SIZE; tile++)
 	{
 		snake->body[tile].x_pos = snake_x;
 	       	snake->body[tile].y_pos = snake_y;
+		col = snake_x / TILESIZE;
+		field[row][col] = SNAKE;
 		snake_x += TILESIZE; 	
 	}
 	
 	return snake;
 }
 
-void moveSnake(Snake *snake)
+void moveSnake(Snake *snake, TileTypes field[ROWS][COLUMNS], State *gameState)
 {
-	findDirection(snake);
-	int length = snake->length - 1;
-	for (int tile = length; tile >= 0; tile--)
-	{
-		if (tile == 0)
-		{
-			switch(snake->direction)
-			{
-				case UP:
-				 	snake->body->y_pos -= TILESIZE;
-					break;
-				case DOWN:
-					snake->body->y_pos += TILESIZE;
-					break;
-				case RIGHT:
-					snake->body->x_pos += TILESIZE;
-					break;
-				case LEFT:
-					snake->body->x_pos -= TILESIZE;
-					break;
-			}
-			break;
+	clearField(field);
+	int tail_index = snake->length - 1;
+	int old_tail_x = snake->body[tail_index].x_pos; 
+	int old_tail_y = snake->body[tail_index].y_pos;
 
-		}
+	for (int tile = tail_index; tile > 0; tile--)
+	{
 		int next_tile = tile - 1;
-		int next_x_pos = snake->body[next_tile].x_pos;
-		int next_y_pos = snake->body[next_tile].y_pos;
-		snake->body[tile].x_pos = next_x_pos;
-		snake->body[tile].y_pos = next_y_pos;
+		snake->body[tile].x_pos = snake->body[next_tile].x_pos;
+		snake->body[tile].y_pos = snake->body[next_tile].y_pos;
 	}
+	
+	switch(snake->direction)
+	{
+		case UP:
+			snake->body[0].y_pos -= TILESIZE;
+			break;
+		case DOWN:
+			snake->body[0].y_pos += TILESIZE;
+			break;
+		case RIGHT:
+			snake->body[0].x_pos += TILESIZE;
+			break;
+		case LEFT:
+			snake->body[0].x_pos -= TILESIZE;
+			break;
+	}
+
+	if(checkSnakeColision(snake))
+	{
+		*gameState = GAME_OVER;
+		return;
+	}
+
+	int head_row = snake->body[0].y_pos / TILESIZE;
+	int head_col = snake->body[0].x_pos / TILESIZE;
+	bool ate_apple = false;
+
+	if(field[head_row][head_col] == APPLE)
+	{
+		growSnake(snake, old_tail_x, old_tail_y);
+		ate_apple = true;
+		if(snake->length == ROWS * COLUMNS)
+		{
+			*gameState = GAME_OVER; 
+			return;
+		}
+	}
+
+	int snake_length = snake->length;
+	for(int tile = 0; tile < snake_length; tile++)
+	{
+		int row = snake->body[tile].y_pos / TILESIZE;
+		int col = snake->body[tile].x_pos / TILESIZE;
+		field[row][col] = SNAKE;
+	}
+
+	if(ate_apple) putApple(field);
 }
 
 void findDirection(Snake *snake)
@@ -74,6 +101,89 @@ void findDirection(Snake *snake)
 	else if(IsKeyPressed(KEY_LEFT) && dir != RIGHT) snake->direction = LEFT;
 }
 
+bool checkSnakeColision(Snake *snake)
+{
+	int head_x = snake->body[0].x_pos;
+	int head_y = snake->body[0].y_pos;
+	if (head_x < 0 || head_x >= WIDTH || head_y < 0 || head_y >= HEIGHT) return true;
+	
+	int snake_length = snake->length;
+	for(int tile = 1; tile < snake_length; tile++)
+	{
+		if(head_x == snake->body[tile].x_pos && head_y == snake->body[tile].y_pos)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void growSnake(Snake *snake, int old_tail_x, int old_tail_y)
+{
+	int new_tail_index = snake->length;
+	snake->body[new_tail_index].x_pos = old_tail_x;
+	snake->body[new_tail_index].y_pos = old_tail_y;
+	snake->length++;
+}
+
+void initField(TileTypes field[ROWS][COLUMNS])
+{
+	for (int row = 0; row < ROWS; row++)
+	{
+		for (int col = 0; col < COLUMNS; col++)
+		{
+			field[row][col] = EMPTY;
+		}
+	}
+}
+
+void clearField(TileTypes field[ROWS][COLUMNS])
+{
+	for (int row = 0; row < ROWS; row++)
+	{
+		for (int col = 0; col < COLUMNS; col++)
+		{
+			if (field[row][col] != APPLE)
+			{
+				field[row][col] = EMPTY;
+			}
+		}
+	}
+}
+
+void putApple(TileTypes field[ROWS][COLUMNS])
+{
+	int emptyTiles = 0;
+	for (int row = 0; row < ROWS; row ++)
+	{
+		for (int col = 0; col < COLUMNS; col++)
+		{
+			if(field[row][col] == EMPTY) emptyTiles++;
+		}
+	}
+
+	int apple_place = GetRandomValue(0, emptyTiles - 1);
+	int apple_put = 0;
+
+	for (int row = 0; row < ROWS; row++)
+	{
+		for (int col = 0; col < COLUMNS; col++)
+		{
+			if(field[row][col] == SNAKE) continue;
+			if(apple_place == 0)
+			{
+				field[row][col] = APPLE;
+				apple_put = 1;
+				break;
+			}
+			apple_place--;
+		}
+
+		if (apple_put == 1) break; 
+	}
+
+}
 
 Texture2D getMainMenuTexture(void)
 {

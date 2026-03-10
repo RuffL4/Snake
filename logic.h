@@ -3,14 +3,16 @@
 #include <stdbool.h>
 #define WIDTH 900
 #define HEIGHT 600
-#define FPS 10
+#define FPS 60
+#define MAX_FRAME_TIME 0.12f
 #define TILESIZE 30
 #define ROWS (HEIGHT / TILESIZE)
 #define COLUMNS (WIDTH / TILESIZE)
 #define START_SNAKE_SIZE 3
 #define SNAKE_COLOR RAYWHITE
-#define SNAKE_HEAD_START_X (COLUMNS / 2 * TILESIZE);
-#define SNAKE_HEAD_START_Y (ROWS / 2 * TILESIZE);
+#define SNAKE_HEAD_START_X (COLUMNS / 2 * TILESIZE)
+#define SNAKE_HEAD_START_Y (ROWS / 2 * TILESIZE)
+#define APPLE_COLOR RED
 
 
 typedef enum 
@@ -43,7 +45,7 @@ typedef struct snakeTile
 
 typedef struct snake
 {
-	SnakeTile *body;
+	SnakeTile body[ROWS * COLUMNS];
 	int length;
 	Direction direction;
 } Snake;
@@ -56,9 +58,14 @@ typedef struct Button
 	Rectangle hitbox;
 } Button;
 
-Snake* initSnake();
-void moveSnake(Snake *snake); // calculationg where snake body should be 
+Snake* initSnake(TileTypes field[ROWS][COLUMNS]);
+void moveSnake(Snake *snake, TileTypes field[ROWS][COLUMNS], State *gameState); // calculationg where snake body should be 
 void findDirection(Snake *snake); // depend on buttons pressed finding direction
+bool checkSnakeColision(Snake *snake); // checking if snake is out of field or eating itself
+void growSnake(Snake *snake, int old_tail_x, int old_tail_y); // growing snake if it eats an apple
+void initField(TileTypes field[ROWS][COLUMNS]); // init field with EMPTY
+void clearField(TileTypes field[ROWS][COLUMNS]); // fill the field with EMPTY if not APPLE;
+void putApple(TileTypes field[ROWS][COLUMNS]); // put an APPLE in EMPTY field
 Texture2D getMainMenuTexture(void); // get Texture for main menu from an Image
 Button initButton(void); // make a new game button from an Image
 bool checkButtonColision(int mouse_x, int mouse_y, Button *newGameButton); // checking if mouse is over the button
