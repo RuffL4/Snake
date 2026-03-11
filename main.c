@@ -11,6 +11,7 @@ int main(void)
     SetRandomSeed(1);
 
     Texture2D mainMenuTexture = getMainMenuTexture();
+    Texture2D gameOverTexture = getGameOverTexture();
     Button newGameButton = initButton();
 
     State gameState = NEW_GAME;
@@ -29,7 +30,7 @@ int main(void)
 	switch(gameState)
 	{
 		case NEW_GAME:
-			startNewGame(mouse_x, mouse_y, &newGameButton, &gameState);
+			startNewGame(mouse_x, mouse_y, &newGameButton, &gameState, &snake, field);
 			break;
 		case PLAYING:
 			timeCounter += GetFrameTime();
@@ -42,7 +43,7 @@ int main(void)
 			}
 			break;
 		case GAME_OVER:
-			//TODO
+			startNewGame(mouse_x, mouse_y, &newGameButton, &gameState, &snake, field);
 			break;	
 	}
         BeginDrawing();
@@ -52,13 +53,13 @@ int main(void)
 	    switch(gameState)
 	    {
 		    case NEW_GAME:
-			drawMainMenu(mouse_x, mouse_y, &mainMenuTexture, &newGameButton);
+			drawMenu(mouse_x, mouse_y, &mainMenuTexture, &newGameButton);
 			break;
 		    case PLAYING:
 			drawField(field);
 			break;
 		    case GAME_OVER:
-			//TODO
+			drawMenu(mouse_x, mouse_y, &gameOverTexture, &newGameButton);
 			break;	    
 	    }
         EndDrawing();
@@ -66,6 +67,7 @@ int main(void)
 
     free(snake);
     UnloadTexture(mainMenuTexture);
+    UnloadTexture(gameOverTexture);
     UnloadTexture(newGameButton.button);
     UnloadTexture(newGameButton.button_hovered);
     CloseWindow();

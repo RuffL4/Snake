@@ -2,5 +2,5 @@
 #include "logic.h"
 
 
-void drawMainMenu(int mouse_x, int mouse_y, Texture2D *mainMenuTexture, Button *newGameButton); // drawing menu & button in NEW_GAME State; 	
+void drawMenu(int mouse_x, int mouse_y, Texture2D *menuTexture, Button *newGameButton); // drawing main menu or game over & button in NEW_GAME or GAME_OVER State; 	
 void drawField(TileTypes field[ROWS][COLUMNS]); // drawing snake; 

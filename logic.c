@@ -10,6 +10,7 @@ Snake* initSnake(TileTypes field[ROWS][COLUMNS])
 	if(snake == NULL) return NULL;
 
 	snake->direction = LEFT;
+	snake->lastDir = LEFT;
 	snake->length = START_SNAKE_SIZE;
 	
 	int snake_x = SNAKE_HEAD_START_X;
@@ -72,13 +73,13 @@ void moveSnake(Snake *snake, TileTypes field[ROWS][COLUMNS], State *gameState)
 
 	if(field[head_row][head_col] == APPLE)
 	{
-		growSnake(snake, old_tail_x, old_tail_y);
 		ate_apple = true;
 		if(snake->length == ROWS * COLUMNS)
 		{
 			*gameState = GAME_OVER; 
 			return;
 		}
+		growSnake(snake, old_tail_x, old_tail_y);
 	}
 
 	int snake_length = snake->length;
@@ -90,15 +91,17 @@ void moveSnake(Snake *snake, TileTypes field[ROWS][COLUMNS], State *gameState)
 	}
 
 	if(ate_apple) putApple(field);
+
+	snake->lastDir = snake->direction;
 }
 
 void findDirection(Snake *snake)
 {
-	Direction dir = snake->direction;
-	if(IsKeyPressed(KEY_UP) && dir != DOWN) snake->direction = UP;
-	else if(IsKeyPressed(KEY_DOWN) && dir != UP) snake->direction = DOWN;
-	else if(IsKeyPressed(KEY_RIGHT) && dir != LEFT) snake->direction = RIGHT;
-	else if(IsKeyPressed(KEY_LEFT) && dir != RIGHT) snake->direction = LEFT;
+	Direction last = snake->lastDir;
+	if(IsKeyPressed(KEY_UP) && last != DOWN) snake->direction = UP;
+	else if(IsKeyPressed(KEY_DOWN) && last != UP) snake->direction = DOWN;
+	else if(IsKeyPressed(KEY_RIGHT) && last != LEFT) snake->direction = RIGHT;
+	else if(IsKeyPressed(KEY_LEFT) && last != RIGHT) snake->direction = LEFT;
 }
 
 bool checkSnakeColision(Snake *snake)
@@ -185,13 +188,30 @@ void putApple(TileTypes field[ROWS][COLUMNS])
 
 }
 
+void deleteOldGame(Snake **snake, TileTypes field[ROWS][COLUMNS])
+{
+	initField(field);
+	if(*snake != 0) free(*snake);
+	*snake = initSnake(field);
+	putApple(field);
+}
+
 Texture2D getMainMenuTexture(void)
 {
-	Image mainMenuImg = LoadImage("Main_menu.png");
+	Image mainMenuImg = LoadImage("./assets/Main_menu.png");
 	ImageResize(&mainMenuImg, WIDTH, HEIGHT);
 	Texture2D mainMenuTexture = LoadTextureFromImage(mainMenuImg);
 	UnloadImage(mainMenuImg);
 	return mainMenuTexture;
+}
+
+Texture2D getGameOverTexture(void)
+{
+	Image gameOverImg = LoadImage("./assets/Game_over.png");
+	ImageResize(&gameOverImg, WIDTH, HEIGHT);
+	Texture2D gameOverTexture = LoadTextureFromImage(gameOverImg);
+	UnloadImage(gameOverImg);
+	return gameOverTexture;
 }
 
 Button initButton(void)
@@ -206,8 +226,8 @@ Button initButton(void)
        	float hitbox_x = button_x + button_x / 8;
 	float hitbox_y = button_y + button_y / 6;	
 
-	Image buttonImg = LoadImage("button.png");
-	Image button_hoverImg = LoadImage("Button_hover.png");
+	Image buttonImg = LoadImage("./assets/button.png");
+	Image button_hoverImg = LoadImage("./assets/Button_hover.png");
 	ImageResize(&buttonImg, button_width, button_height);
 	ImageResize(&button_hoverImg, button_width, button_height);
 	Texture2D button = LoadTextureFromImage(buttonImg);
@@ -242,13 +262,17 @@ bool checkButtonColision(int mouse_x, int mouse_y, Button *newGameButton)
 	return false;
 }
 
-void startNewGame(int mouse_x, int mouse_y, Button *newGameButton, State *gameState)
+void startNewGame(int mouse_x, int mouse_y, Button *newGameButton, State *gameState, Snake **snake, TileTypes field[ROWS][COLUMNS])
 {
 	bool colision = checkButtonColision(mouse_x, mouse_y, newGameButton);
 	bool mouse_click = IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
 	
 	if(colision && mouse_click)
 	{
+		if(*gameState == GAME_OVER)
+		{
+			deleteOldGame(snake, field);
+		}
 		*gameState = PLAYING; 
 	}
 }

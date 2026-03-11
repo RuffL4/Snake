@@ -4,13 +4,13 @@
 #include <stdbool.h>
 
 
-void drawMainMenu(int mouse_x, int mouse_y, Texture2D *mainMenuTexture, Button *newGameButton)
+void drawMenu(int mouse_x, int mouse_y, Texture2D *menuTexture, Button *newGameButton)
 {
 	float button_x = newGameButton->rect.x;
 	float button_y = newGameButton->rect.y;
 	
 	bool colision = checkButtonColision(mouse_x, mouse_y, newGameButton);
-	DrawTexture(*mainMenuTexture, 0, 0, WHITE);
+	DrawTexture(*menuTexture, 0, 0, WHITE);
 	
 	if (colision)
 	{
